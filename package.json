@@ -20,7 +20,7 @@
     "build": "expo-module build",
     "clean": "expo-module clean",
     "test": "expo-module test",
-    "prepare": "expo-module prepare",
+    "prepare": "expo-module prepare && husky",
     "prepublishOnly": "EXPO_NONINTERACTIVE=1 expo-module build",
     "pack:check": "npm pack --dry-run"
   },
@@ -54,9 +54,12 @@
     "@expo/config-plugins": "^54.0.0"
   },
   "devDependencies": {
+    "@commitlint/cli": "^21.2.1",
+    "@commitlint/config-conventional": "^21.2.0",
     "@types/react": "~19.1.10",
     "expo": "~54.0.34",
     "expo-module-scripts": "^4.1.10",
+    "husky": "^9.1.7",
     "react": "19.1.0",
     "react-native": "0.81.5",
     "typescript": "~5.9.2"
