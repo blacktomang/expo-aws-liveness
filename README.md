@@ -11,12 +11,6 @@ This package requires a native build. It does **not** run in Expo Go.
 pnpm add @blacktomang/expo-aws-liveness
 ```
 
-For local testing before publishing:
-
-```sh
-pnpm add file:/Users/syam/Projects/expo-aws-liveness
-```
-
 Add the plugin to your Expo configuration. It adds Android camera permission
 and, unless you already set one, an iOS camera-usage description.
 
