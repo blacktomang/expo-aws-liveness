@@ -39,6 +39,31 @@ npx expo run:android
 # or: npx expo run:ios
 ```
 
+## iOS first build: please be patient
+
+The first iOS build can take noticeably longer than Android. This package uses
+AWS's native SwiftUI liveness component, which Xcode downloads through Swift
+Package Manager along with its AWS dependencies.
+
+On a new machine, a clean cache, or a fresh CI runner, Xcode may spend several
+minutes at **Resolving Package Graph** or **Planning build**. It can look like
+the build has stopped, but it is usually downloading and preparing those Swift
+packages. Once they are cached, later iOS builds are much faster.
+
+If you want to see package-resolution progress directly, run this from your
+generated iOS directory (replace `<AppName>` with your app's iOS project name):
+
+```sh
+cd ios
+xcodebuild -workspace <AppName>.xcworkspace \
+  -scheme <AppName> \
+  -resolvePackageDependencies
+```
+
+For CI, cache the Xcode/Swift Package Manager dependency cache when possible.
+The module pins its native AWS dependency versions so the resolved build stays
+reproducible.
+
 ## Usage
 
 ```tsx
@@ -72,16 +97,3 @@ await getLivenessResult(sessionId);
 Create the liveness session and retrieve its score on your backend. The client
 should receive a one-time `sessionId` and temporary Cognito permissions only
 for `rekognition:StartFaceLivenessSession`.
-
-## Publish privately
-
-Commit this directory to a private Git repository, tag releases, then either
-install by Git URL or publish it to a private npm-compatible registry.
-
-```sh
-pnpm build
-npm pack                 # inspect the actual archive first
-npm publish              # after configuring your registry and credentials
-```
-
-Change the `name` field in `package.json` if your npm scope is not `@blacktomang`.
