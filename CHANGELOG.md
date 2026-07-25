@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.2.1](https://github.com/blacktomang/expo-aws-liveness/compare/v0.2.0...v0.2.1) (2026-07-25)
+
+
+### Bug Fixes
+
+* synchronize pnpm lockfile ([e6a13ae](https://github.com/blacktomang/expo-aws-liveness/commit/e6a13ae033d39219c3d7d46f38245a4c09165695))
+* synchronize pnpm lockfile ([e546abb](https://github.com/blacktomang/expo-aws-liveness/commit/e546abb90ef94d932bbc49fe456e953cd33db3f0))
+
 ## [0.2.0](https://github.com/blacktomang/expo-aws-liveness/compare/v0.1.0...v0.2.0) (2026-07-25)
 
 
