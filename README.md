@@ -42,31 +42,77 @@ npx expo run:android
 ## Usage
 
 ```tsx
-import { Platform } from "react-native";
+import { useRef } from "react";
+import { Button } from "react-native";
 import {
-  ExpoAwsLivenessView,
-  presentLiveness,
+  ExpoAwsLiveness,
+  type ExpoAwsLivenessHandle,
 } from "@blacktomang/expo-aws-liveness";
 
-if (Platform.OS === "android") {
+function VerifyFace() {
+  const liveness = useRef<ExpoAwsLivenessHandle>(null);
+
+  const startLiveness = async () => {
+    if (!liveness.current) return;
+
+    try {
+      await liveness.current.start();
+      await getLivenessResult(sessionId);
+    } catch (error) {
+      // onError receives the same normalized failure.
+    }
+  };
+
   return (
-    <ExpoAwsLivenessView
-      sessionId={sessionId}
-      region="us-east-1"
-      identityPoolId="us-east-1:your-identity-pool-id"
-      onComplete={() => getLivenessResult(sessionId)}
-      onError={(error) => console.error(error.errorCode, error.message)}
-      style={{ flex: 1 }}
-    />
+    <>
+      <ExpoAwsLiveness
+        ref={liveness}
+        sessionId={sessionId}
+        region="us-east-1"
+        identityPoolId="us-east-1:your-identity-pool-id"
+        onError={(error) =>
+          console.error(error.code, error.nativeErrorCode, error.message)
+        }
+        style={{ flex: 1 }}
+      />
+      <Button title="Verify face" onPress={startLiveness} />
+    </>
   );
 }
+```
 
-await presentLiveness({
-  sessionId,
-  region: "us-east-1",
-  identityPoolId: "us-east-1:your-identity-pool-id",
-});
-await getLivenessResult(sessionId);
+`start()` returns `{ isLive: true }` on completion and invokes `onComplete` / `onError` with the same outcome. An overlapping call rejects with `LIVENESS_IN_PROGRESS`. Errors use a stable `code` and retain the iOS or Android SDK value in `nativeErrorCode`.
+
+Android displays the detector inside `ExpoAwsLiveness`, so `style` controls its layout. iOS presents the detector full-screen and ignores `style`.
+
+## Why iOS and Android differ internally
+
+Android can embed AWS Face Liveness directly: the AWS SDK exposes a Jetpack Compose component, which this module mounts inside a React Native native view.
+
+iOS uses the same public `ExpoAwsLiveness` API, but presents the detector modally. AWS Face Liveness and its Amplify dependencies are Swift Package Manager packages, while Expo modules compile as CocoaPods. Importing those Swift packages from the Expo pod fails native AWS C-module resolution. To work around that limitation, the config plugin adds the Swift packages and a small liveness implementation to the host app target, where SwiftPM dependencies link correctly.
+
+This means that on iOS the detector:
+
+- Is always presented full-screen from the active view controller; it cannot be embedded or styled as a React Native view.
+- Requires the config plugin's generated AppDelegate registration and host-app Swift source.
+- Returns its result after the modal screen finishes, while Android receives native view events. `ExpoAwsLiveness` normalizes both approaches behind `start()`, `onComplete`, and `onError`.
+
+On both platforms, Amplify can only be configured once per app process. Reusing the module with a different region or identity pool returns `AMPLIFY_CONFIG_CONFLICT`.
+
+## Legacy APIs
+
+`ExpoAwsLivenessView` (Android-only) and `presentLiveness` (iOS-only) remain available for existing applications, but are deprecated. Migrate to `ExpoAwsLiveness` to remove platform branches from application code.
+
+```tsx
+// Deprecated Android-only API
+<ExpoAwsLivenessView
+  sessionId={sessionId}
+  region="us-east-1"
+  identityPoolId="us-east-1:your-identity-pool-id"
+  onComplete={() => getLivenessResult(sessionId)}
+  onError={(error) => console.error(error.errorCode, error.message)}
+  style={{ flex: 1 }}
+/>
 ```
 
 Create the liveness session and retrieve its score on your backend. The client

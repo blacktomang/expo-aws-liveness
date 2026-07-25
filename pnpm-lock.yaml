@@ -30,12 +30,18 @@ importers:
       husky:
         specifier: ^9.1.7
         version: 9.1.7
+      jest:
+        specifier: ^29.7.0
+        version: 29.7.0(@types/node@26.1.1)
       react:
         specifier: 19.1.0
         version: 19.1.0
       react-native:
         specifier: 0.81.5
         version: 0.81.5(@babel/core@7.29.7)(@types/react@19.1.17)(react@19.1.0)
+      react-test-renderer:
+        specifier: 19.0.0
+        version: 19.0.0(react@19.1.0)
       typescript:
         specifier: ~5.9.2
         version: 5.9.3
