@@ -1,4 +1,4 @@
-# @syam/expo-aws-liveness
+# @blacktomang/expo-aws-liveness
 
 An Expo native module for Amazon Rekognition Face Liveness. It bridges AWS's
 official Android Compose and iOS SwiftUI liveness components to an Expo app.
@@ -8,7 +8,7 @@ This package requires a native build. It does **not** run in Expo Go.
 ## Install
 
 ```sh
-pnpm add @syam/expo-aws-liveness
+pnpm add @blacktomang/expo-aws-liveness
 ```
 
 For local testing before publishing:
@@ -26,7 +26,7 @@ export default {
   expo: {
     plugins: [
       [
-        "@syam/expo-aws-liveness",
+        "@blacktomang/expo-aws-liveness",
         {
           cameraPermission:
             "Allow $(PRODUCT_NAME) to use the camera for face verification.",
@@ -52,7 +52,7 @@ import { Platform } from "react-native";
 import {
   ExpoAwsLivenessView,
   presentLiveness,
-} from "@syam/expo-aws-liveness";
+} from "@blacktomang/expo-aws-liveness";
 
 if (Platform.OS === "android") {
   return (
@@ -90,4 +90,4 @@ npm pack                 # inspect the actual archive first
 npm publish              # after configuring your registry and credentials
 ```
 
-Change the `name` field in `package.json` if your npm scope is not `@syam`.
+Change the `name` field in `package.json` if your npm scope is not `@blacktomang`.

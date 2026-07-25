@@ -1,5 +1,5 @@
 {
-  "name": "@syam/expo-aws-liveness",
+  "name": "@blacktomang/expo-aws-liveness",
   "version": "0.1.0",
   "description": "Expo native module wrapping AWS Amplify Face Liveness UI for iOS and Android",
   "main": "build/index.js",
