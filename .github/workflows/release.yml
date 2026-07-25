@@ -15,35 +15,28 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Create release PR and GitHub Release
-        id: release
-        uses: googleapis/release-please-action@v4
-        with:
-          release-type: node
-
-      - name: Check out the release commit
-        if: ${{ steps.release.outputs.release_created }}
+      - name: Check out
         uses: actions/checkout@v6
         with:
-          ref: ${{ steps.release.outputs.sha }}
+          fetch-depth: 0
 
       - name: Set up Node
-        if: ${{ steps.release.outputs.release_created }}
         uses: actions/setup-node@v6
         with:
           node-version: '24'
           registry-url: 'https://registry.npmjs.org'
+          scope: '@blacktomang'
           package-manager-cache: false
 
       - name: Set up pnpm
-        if: ${{ steps.release.outputs.release_created }}
         uses: pnpm/action-setup@v4
         with:
           version: 10.33.0
 
-      - name: Install, build, and publish with npm OIDC
-        if: ${{ steps.release.outputs.release_created }}
+      - name: Install and build
         run: |
           pnpm install --frozen-lockfile
           EXPO_NONINTERACTIVE=1 pnpm run build
-          npm publish
+
+      - name: Release to npm and GitHub
+        run: pnpm exec semantic-release
