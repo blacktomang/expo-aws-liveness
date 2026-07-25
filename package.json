@@ -1,6 +1,6 @@
 {
   "name": "@blacktomang/expo-aws-liveness",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Expo native module wrapping AWS Amplify Face Liveness UI for iOS and Android",
   "main": "build/index.js",
   "types": "build/index.d.ts",
