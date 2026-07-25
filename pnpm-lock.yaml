@@ -18,9 +18,15 @@ importers:
       '@commitlint/config-conventional':
         specifier: ^21.2.0
         version: 21.2.0
+      '@types/jest':
+        specifier: ^29.5.14
+        version: 29.5.14
       '@types/react':
         specifier: ~19.1.10
         version: 19.1.17
+      babel-jest:
+        specifier: ^29.7.0
+        version: 29.7.0(@babel/core@7.29.7)
       expo:
         specifier: ~54.0.34
         version: 54.0.36(@babel/core@7.29.7)(react-native@0.81.5(@babel/core@7.29.7)(@types/react@19.1.17)(react@19.1.0))(react@19.1.0)(typescript@5.9.3)
