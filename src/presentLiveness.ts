@@ -28,7 +28,7 @@ export async function presentLivenessOnIos(
   const fn = nativeModule().presentLiveness;
   if (!fn) {
     throw new Error(
-      "ExpoAwsLiveness.presentLiveness is unavailable. Did the AppDelegate registry injection run?",
+      "ExpoAwsLiveness.presentLiveness is unavailable. Check that the Expo module is installed and the iOS project is rebuilt.",
     );
   }
   return fn(opts);

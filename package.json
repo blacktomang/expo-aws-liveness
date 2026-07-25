@@ -9,7 +9,6 @@
     "android/src",
     "build",
     "ios",
-    "ios-app-target",
     "plugin",
     "app.plugin.js",
     "expo-module.config.json",

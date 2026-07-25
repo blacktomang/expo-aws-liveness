@@ -114,12 +114,11 @@ Android displays the detector inside `ExpoAwsLiveness`, so `style` controls its 
 
 Android can embed AWS Face Liveness directly: the AWS SDK exposes a Jetpack Compose component, which this module mounts inside a React Native native view.
 
-iOS uses the same public `ExpoAwsLiveness` API, but presents the detector modally. AWS Face Liveness and its Amplify dependencies are Swift Package Manager packages, while Expo modules compile as CocoaPods. Importing those Swift packages from the Expo pod fails native AWS C-module resolution. To work around that limitation, the config plugin adds the Swift packages and a small liveness implementation to the host app target, where SwiftPM dependencies link correctly.
+iOS uses the same public `ExpoAwsLiveness` API, but presents the detector modally. AWS Face Liveness and its Amplify dependencies are Swift Package Manager packages, so the iOS podspec declares them with `spm_dependency` (React Native 0.81+). This lets the Expo module import and use the SwiftUI detector directly, without the AppDelegate patching or host-app Swift source files that earlier workarounds required.
 
 This means that on iOS the detector:
 
 - Is always presented full-screen from the active view controller; it cannot be embedded or styled as a React Native view.
-- Requires the config plugin's generated AppDelegate registration and host-app Swift source.
 - Returns its result after the modal screen finishes, while Android receives native view events. `ExpoAwsLiveness` normalizes both approaches behind `start()`, `onComplete`, and `onError`.
 
 On both platforms, Amplify can only be configured once per app process. Reusing the module with a different region or identity pool returns `AMPLIFY_CONFIG_CONFLICT`.
