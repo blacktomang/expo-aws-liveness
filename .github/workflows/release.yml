@@ -24,8 +24,6 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: '24'
-          registry-url: 'https://registry.npmjs.org'
-          scope: '@blacktomang'
           package-manager-cache: false
 
       - name: Set up pnpm
@@ -39,4 +37,6 @@ jobs:
           EXPO_NONINTERACTIVE=1 pnpm run build
 
       - name: Release to npm and GitHub
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: pnpm exec semantic-release
