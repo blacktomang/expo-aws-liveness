@@ -1,0 +1,10 @@
+node_modules/
+build/
+.expo/
+android/.gradle/
+android/build/
+ios/build/
+*.xcworkspace
+xcuserdata/
+DerivedData/
+*.tgz

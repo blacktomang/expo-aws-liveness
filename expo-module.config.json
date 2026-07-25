@@ -1,0 +1,11 @@
+{
+  "platforms": ["apple", "android"],
+  "coreFeatures": ["compose"],
+  "apple": {
+    "modules": ["ExpoAwsLivenessModule"]
+  },
+  "android": {
+    "modules": ["expo.modules.awsliveness.ExpoAwsLivenessModule"]
+  }
+}
+
