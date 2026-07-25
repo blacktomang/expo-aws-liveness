@@ -21,7 +21,7 @@
     "clean": "expo-module clean",
     "test": "expo-module test",
     "prepare": "expo-module prepare",
-    "prepublishOnly": "expo-module prepublishOnly",
+    "prepublishOnly": "EXPO_NONINTERACTIVE=1 expo-module build",
     "pack:check": "npm pack --dry-run"
   },
   "keywords": [
@@ -34,6 +34,17 @@
   ],
   "author": "Syam",
   "license": "MIT",
+  "homepage": "https://github.com/blacktomang/expo-aws-liveness#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/blacktomang/expo-aws-liveness.git"
+  },
+  "bugs": {
+    "url": "https://github.com/blacktomang/expo-aws-liveness/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "peerDependencies": {
     "expo": ">=54.0.0",
     "react": ">=19.0.0",
