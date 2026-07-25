@@ -59,6 +59,21 @@ class ExpoAwsLivenessView(context: Context, appContext: AppContext) :
       tryMount()
     }
 
+  // The deprecated ExpoAwsLivenessView starts when mounted. The new
+  // cross-platform component opts out and supplies an incrementing attemptId
+  // each time its imperative start() method is called.
+  var autoStart: Boolean = false
+    set(value) {
+      field = value
+      tryMount()
+    }
+
+  var attemptId: Int = 0
+    set(value) {
+      field = value
+      tryMount()
+    }
+
   private val composeView = ComposeView(context).apply {
     layoutParams = FrameLayout.LayoutParams(MATCH_PARENT, MATCH_PARENT)
     setViewCompositionStrategy(
@@ -66,7 +81,7 @@ class ExpoAwsLivenessView(context: Context, appContext: AppContext) :
     )
   }
 
-  private var hasMounted = false
+  private var mountedAttemptId: Int? = null
 
   init {
     addView(composeView)
@@ -106,8 +121,13 @@ class ExpoAwsLivenessView(context: Context, appContext: AppContext) :
   }
 
   private fun tryMount() {
-    if (hasMounted) {
-      Log.d(TAG, "tryMount: already mounted, skipping")
+    val requestedAttemptId = if (autoStart) 0 else attemptId.takeIf { it > 0 }
+    if (requestedAttemptId == null) {
+      Log.d(TAG, "tryMount: waiting for an explicit attempt")
+      return
+    }
+    if (mountedAttemptId == requestedAttemptId) {
+      Log.d(TAG, "tryMount: attempt $requestedAttemptId already mounted, skipping")
       return
     }
     if (sessionId.isEmpty() || region.isEmpty() || identityPoolId.isEmpty()) {
@@ -123,7 +143,18 @@ class ExpoAwsLivenessView(context: Context, appContext: AppContext) :
       return
     }
 
-    Log.d(TAG, "tryMount: configuring Amplify and mounting FaceLivenessDetector")
+    Log.d(
+      TAG,
+      "tryMount: configuring Amplify and mounting FaceLivenessDetector for attempt $requestedAttemptId"
+    )
+
+    // A completed or failed detector can be started again only by replacing
+    // its Compose composition. The JS wrapper prevents overlapping attempts,
+    // so this only happens between settled attempts.
+    if (mountedAttemptId != null) {
+      composeView.disposeComposition()
+      mountedAttemptId = null
+    }
 
     try {
       AmplifyConfigurator.configure(context, region, identityPoolId)
@@ -132,7 +163,8 @@ class ExpoAwsLivenessView(context: Context, appContext: AppContext) :
       onError(
         mapOf(
           "message" to (e.message ?: "Amplify configuration conflict"),
-          "errorCode" to "AMPLIFY_CONFIG_CONFLICT"
+          "errorCode" to "AMPLIFY_CONFIG_CONFLICT",
+          "attemptId" to requestedAttemptId
         )
       )
       return
@@ -141,7 +173,8 @@ class ExpoAwsLivenessView(context: Context, appContext: AppContext) :
       onError(
         mapOf(
           "message" to (e.message ?: "Failed to configure Amplify"),
-          "errorCode" to e::class.simpleName.orEmpty()
+          "errorCode" to e::class.simpleName.orEmpty(),
+          "attemptId" to requestedAttemptId
         )
       )
       return
@@ -151,6 +184,7 @@ class ExpoAwsLivenessView(context: Context, appContext: AppContext) :
     val capturedRegion = region
     val capturedDisableStartView = disableStartView
     val capturedTheme = theme
+    val capturedAttemptId = requestedAttemptId
 
     Log.d(
       TAG,
@@ -173,7 +207,12 @@ class ExpoAwsLivenessView(context: Context, appContext: AppContext) :
           disableStartView = capturedDisableStartView,
           onComplete = {
             Log.d(TAG, "FaceLivenessDetector onComplete")
-            onComplete(mapOf("isLive" to true))
+            onComplete(
+              mapOf(
+                "isLive" to true,
+                "attemptId" to capturedAttemptId
+              )
+            )
           },
           onError = { error ->
             // FaceLivenessDetectionException is not a Throwable in liveness:1.5.0
@@ -183,14 +222,15 @@ class ExpoAwsLivenessView(context: Context, appContext: AppContext) :
             onError(
               mapOf(
                 "message" to error.message,
-                "errorCode" to error::class.simpleName.orEmpty()
+                "errorCode" to error::class.simpleName.orEmpty(),
+                "attemptId" to capturedAttemptId
               )
             )
           },
         )
       }
     }
-    hasMounted = true
+    mountedAttemptId = requestedAttemptId
     // Force a relayout — on RN Fabric, child native views sometimes need a
     // nudge after setContent runs.
     composeView.requestLayout()
@@ -199,6 +239,7 @@ class ExpoAwsLivenessView(context: Context, appContext: AppContext) :
 
   override fun onDetachedFromWindow() {
     composeView.disposeComposition()
+    mountedAttemptId = null
     super.onDetachedFromWindow()
   }
 }

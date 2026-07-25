@@ -39,6 +39,14 @@ class ExpoAwsLivenessModule : Module() {
       Prop("theme") { view: ExpoAwsLivenessView, theme: String? ->
         view.theme = theme
       }
+
+      Prop("autoStart") { view: ExpoAwsLivenessView, autoStart: Boolean ->
+        view.autoStart = autoStart
+      }
+
+      Prop("attemptId") { view: ExpoAwsLivenessView, attemptId: Int ->
+        view.attemptId = attemptId
+      }
     }
   }
 }

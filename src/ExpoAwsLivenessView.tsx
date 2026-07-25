@@ -1,30 +1,20 @@
 import * as React from "react";
 import type { ViewStyle, StyleProp } from "react-native";
-import type { LivenessError } from "./types";
-import { requireNativeView } from "expo";
+import type { LivenessError, LivenessOptions, LivenessResult } from "./types";
+import { NativeExpoAwsLivenessView } from "./NativeExpoAwsLivenessView";
 
-export type LivenessViewProps = {
-  sessionId: string;
-  region: string;
-  identityPoolId: string;
-  /** Skip the SDK's intro/instructions screen. Default: false. */
-  disableStartView?: boolean;
-  /** Force "light" or "dark" colour scheme. Omitted = follow system setting. */
-  theme?: "light" | "dark";
-  onComplete?: (result: { isLive: boolean }) => void;
+export type LivenessViewProps = LivenessOptions & {
+  onComplete?: (result: LivenessResult) => void;
   onError?: (error: LivenessError) => void;
   style?: StyleProp<ViewStyle>;
 };
 
-type NativeViewProps = Omit<LivenessViewProps, "onComplete" | "onError"> & {
-  onComplete?: (event: { nativeEvent: { isLive: boolean } }) => void;
-  onError?: (event: { nativeEvent: LivenessError }) => void;
-};
-
-const NativeView = requireNativeView<NativeViewProps>("ExpoAwsLiveness");
-
 /**
- * android-only view that wraps the native AWS Liveness Detection SDK. This is not a standalone screen — you need to embed this in your own screen, and provide your own header, instructions, error handling, etc.
+ * @deprecated Use <ExpoAwsLiveness ref={ref} /> for a cross-platform API.
+ *
+ * Android-only view that wraps the native AWS Liveness Detection SDK. This is
+ * not a standalone screen — you need to embed this in your own screen, and
+ * provide your own header, instructions, error handling, etc.
  */
 export function ExpoAwsLivenessView({
   onComplete,
@@ -32,8 +22,10 @@ export function ExpoAwsLivenessView({
   ...rest
 }: LivenessViewProps) {
   return (
-    <NativeView
+    <NativeExpoAwsLivenessView
       {...rest}
+      autoStart
+      attemptId={0}
       onComplete={
         onComplete ? (event) => onComplete(event.nativeEvent) : undefined
       }
